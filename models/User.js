@@ -54,14 +54,22 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+
 // Hash password before saving
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+// --- REMOVE 'next' FROM ARGUMENTS ---
+userSchema.pre("save", async function () {
+  // If password is not modified, do nothing
+  if (!this.isModified("password")) return;
 
-  next();
+  try {
+    // Generate salt and hash the password
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  } catch (error) {
+    // Re-throw the error so Mongoose handles it
+    throw error;
+  }
 });
 
 // Compare password
@@ -70,5 +78,6 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 const User = mongoose.model("User", userSchema);
+
 
 module.exports = {User};
