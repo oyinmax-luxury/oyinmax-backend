@@ -1,12 +1,13 @@
+require('dotenv').config();
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const {notFound, errorHandler} = require('./middleware/errorMiddleware');
 const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
 
-dotenv.config();
+
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
-
+app.use('/api/products', productRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

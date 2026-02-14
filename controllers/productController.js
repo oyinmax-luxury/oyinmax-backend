@@ -3,28 +3,42 @@ const {Product} = require('../models/Product');
 const {cloudinary} = require('../config/cloudinary');
 
 // @desc Admin Create Product
-const createProduct = async (req, res, next) => {
+const createProduct = async (req, res) => {
   try {
     const { name, description, price, category, stock, sizes, colors } = req.body;
 
     const imageUploads = [];
 
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const result = await cloudinary.uploader.upload_stream(
-          { folder: "oyinmax_products" },
-          (error, result) => {
-            if (error) throw error;
-            imageUploads.push({
-              public_id: result.public_id,
-              url: result.secure_url,
-            });
-          }
-        );
+    
 
-        result.end(file.buffer);
-      }
+    // ... inside createProduct controller
+
+    if (req.files && req.files.length > 0) {
+    // 1. Create a function that returns a Promise for each file upload
+    const uploadToCloudinary = (file) => {
+        return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { folder: "oyinmax_products" },
+            (error, result) => {
+            if (error) return reject(error);
+            resolve({
+                public_id: result.public_id,
+                url: result.secure_url,
+            });
+            }
+        );
+        stream.end(file.buffer);
+        });
+    };
+
+    // 2. Map files to promises and await all of them
+    const uploadPromises = req.files.map((file) => uploadToCloudinary(file));
+    
+    // 3. Wait for all uploads to finish
+    const results = await Promise.all(uploadPromises);
+    imageUploads.push(...results);
     }
+
 
     const product = await Product.create({
       name,
@@ -40,12 +54,13 @@ const createProduct = async (req, res, next) => {
     res.status(201).json(product);
 
   } catch (error) {
-    next(error);
+    console.error(error);
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
 // @desc Public Get Products (Pagination + Filtering)
-const getProducts = async (req, res, next) => {
+const getProducts = async (req, res) => {
   try {
     const pageSize = 10;
     const page = Number(req.query.page) || 1;
@@ -88,7 +103,8 @@ const getProducts = async (req, res, next) => {
     });
 
   } catch (error) {
-    next(error);
+    console.error(error);
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
