@@ -9,8 +9,6 @@ const createProduct = async (req, res) => {
 
     const imageUploads = [];
 
-    
-
     // ... inside createProduct controller
 
     if (req.files && req.files.length > 0) {
@@ -108,5 +106,129 @@ const getProducts = async (req, res) => {
   }
 };
 
+// @desc Get Single Product
+// @route GET /api/products/:id
+const getSingleProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
 
-module.exports = {createProduct, getProducts};
+    if (!product) {
+      res.status(404);
+      throw new Error("Product not found");
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
+// @desc Update Product
+// @route PUT /api/products/:id
+const updateProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      res.status(404);
+      throw new Error("Product not found");
+    }
+
+    const {
+      name,
+      description,
+      price,
+      category,
+      stock,
+      sizes,
+      colors,
+      isFeatured,
+    } = req.body;
+
+    product.name = name || product.name;
+    product.description = description || product.description;
+    product.price = price || product.price;
+    product.category = category || product.category;
+    product.stock = stock ?? product.stock;
+    product.sizes = sizes || product.sizes;
+    product.colors = colors || product.colors;
+    product.isFeatured = isFeatured ?? product.isFeatured;
+
+    const updatedProduct = await product.save();
+
+    res.json(updatedProduct);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// @desc Delete Product
+// @route DELETE /api/products/:id
+const deleteProduct = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      res.status(404);
+      throw new Error("Product not found");
+    }
+
+    await product.deleteOne();
+
+    res.json({ message: "Product removed successfully" });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+// @desc Create Review
+// @route POST /api/products/:id/reviews
+const createProductReview = async (req, res, next) => {
+  try {
+    const { rating, comment } = req.body;
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      res.status(404);
+      throw new Error("Product not found");
+    }
+
+    const alreadyReviewed = product.reviews.find(
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      res.status(400);
+      throw new Error("Product already reviewed");
+    }
+
+    const review = {
+      user: req.user._id,
+      name: req.user.name,
+      rating: Number(rating),
+      comment,
+    };
+
+    product.reviews.push(review);
+    product.numReviews = product.reviews.length;
+
+    product.rating =
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length;
+
+    await product.save();
+
+    res.status(201).json({ message: "Review added" });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+
+module.exports = {createProduct, getProducts, getSingleProduct, updateProduct, deleteProduct, createProductReview};
