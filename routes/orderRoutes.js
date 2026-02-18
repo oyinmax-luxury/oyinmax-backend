@@ -8,8 +8,8 @@ const {
   updateOrderStatus,
 } = require("../controllers/orderController.js");
 
-const { protect } = require("../middleware/authMiddleware.js");
-const { adminOnly } = require("../middleware/adminMiddleware.js");
+const { protect, adminOnly } = require("../middleware/authMiddleware.js");
+
 
 const router = express.Router();
 

@@ -21,5 +21,6 @@ router.post(
 router.get("/:id", protect, adminOnly, getSingleProduct);
 router.delete("/:id", protect, adminOnly, deleteProduct);
 router.post("/:id/reviews", protect, createProductReview);
+router.put("/:id", protect, adminOnly, upload.array("images", 5), updateProduct);
 
 module.exports = router;

@@ -5,7 +5,7 @@ const {cloudinary} = require('../config/cloudinary');
 // @desc Admin Create Product
 const createProduct = async (req, res) => {
   try {
-    const { name, description, price, category, stock, sizes, colors } = req.body;
+    const { name, description, price, category, stock, sizes, colors} = req.body;
 
     const imageUploads = [];
 
@@ -144,6 +144,7 @@ const updateProduct = async (req, res) => {
       stock,
       sizes,
       colors,
+      images,
       isFeatured,
     } = req.body;
 
@@ -154,6 +155,7 @@ const updateProduct = async (req, res) => {
     product.stock = stock ?? product.stock;
     product.sizes = sizes || product.sizes;
     product.colors = colors || product.colors;
+    product.images = images || product.images;
     product.isFeatured = isFeatured ?? product.isFeatured;
 
     const updatedProduct = await product.save();
