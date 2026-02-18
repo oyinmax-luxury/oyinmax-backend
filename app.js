@@ -9,6 +9,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes');
 const whatsappOrderRoutes = require('./routes/whatsappOrderRoutes');
+const adminUserRoutes = require('./routes/adminUserRoutes');
 
 
 
@@ -39,6 +40,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/whatsapp-orders', whatsappOrderRoutes);
+app.use('/api/admin', adminUserRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
