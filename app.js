@@ -22,7 +22,7 @@ app.use(express.json());
 
 // Configure CORS
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin: ['http://localhost:5173', 'https://oyinmax-frontend.vercel.app/', 'https://www.oyinmaxluxury.com/'],
   credentials: true,                
 }));
 
