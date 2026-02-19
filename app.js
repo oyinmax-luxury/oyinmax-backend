@@ -10,6 +10,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes');
 const whatsappOrderRoutes = require('./routes/whatsappOrderRoutes');
 const adminUserRoutes = require('./routes/adminUserRoutes');
+const adminOrderRoutes = require('./routes/adminOrderRoutes');
 
 
 
@@ -21,7 +22,7 @@ app.use(express.json());
 
 // Configure CORS
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin: ['http://localhost:5173', 'https://oyinmax-frontend.vercel.app/', 'https://www.oyinmaxluxury.com/'],
   credentials: true,                
 }));
 
@@ -41,6 +42,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/whatsapp-orders', whatsappOrderRoutes);
 app.use('/api/admin', adminUserRoutes);
+app.use('/api/admin', adminOrderRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
