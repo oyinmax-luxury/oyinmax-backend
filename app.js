@@ -22,38 +22,31 @@ app.use(express.json());
 
 
 // Configure CORS
-// app.use(cors({
-//   // Removed trailing slashes from the production URLs
-//   origin: [
-//     'http://localhost:5173', 
-//     'https://oyinmax-frontend.vercel.app', 
-//     'https://www.oyinmaxluxury.com'
-//   ],
-//   credentials: true,
-//   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Explicitly allow standard methods
-//   allowedHeaders: ['Content-Type', 'Authorization'] // Ensure headers are allowed
-// }));
-
 const allowedOrigins = [
+  'http://localhost:5173',
+  'https://oyinmax-frontend.vercel.app',
   'https://www.oyinmaxluxury.com',
-  "https://oyinmaxluxury.com", 
-  "http://localhost:5173",
-  "https://oyinmax-frontend.vercel.app",
-  "https://www.oyinmax-frontend.vercel.app"
+  'https://oyinmaxluxury.com' // Added the non-www version just in case
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error("CORS not allowed for this origin"));
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Explicitly allow standard methods
-  allowedHeaders: ['Content-Type', 'Authorization'] // Ensure headers are allowed
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
+
+// Handle preflight requests for all routes
+app.options('*path', cors());
 
 
 app.use(helmet());
