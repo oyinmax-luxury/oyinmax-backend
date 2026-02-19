@@ -20,23 +20,37 @@ const app = express();
 //middleware
 app.use(express.json());
 
-// // Configure CORS
-// app.use(cors({
-//   origin: ['http://localhost:5173', 'https://oyinmax-frontend.vercel.app/', 'https://www.oyinmaxluxury.com/'],
-//   credentials: true,                
-// }));
 
 // Configure CORS
+// app.use(cors({
+//   // Removed trailing slashes from the production URLs
+//   origin: [
+//     'http://localhost:5173', 
+//     'https://oyinmax-frontend.vercel.app', 
+//     'https://www.oyinmaxluxury.com'
+//   ],
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Explicitly allow standard methods
+//   allowedHeaders: ['Content-Type', 'Authorization'] // Ensure headers are allowed
+// }));
+
+const allowedOrigins = [
+  'https://www.oyinmaxluxury.com',
+  "https://oyinmaxluxury.com", 
+  "http://localhost:5173",
+  "https://oyinmax-frontend.vercel.app",
+  "https://www.oyinmax-frontend.vercel.app"
+];
+
 app.use(cors({
-  // Removed trailing slashes from the production URLs
-  origin: [
-    'http://localhost:5173', 
-    'https://oyinmax-frontend.vercel.app', 
-    'https://www.oyinmaxluxury.com'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Explicitly allow standard methods
-  allowedHeaders: ['Content-Type', 'Authorization'] // Ensure headers are allowed
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed for this origin"));
+    }
+  },
+  credentials: true
 }));
 
 
