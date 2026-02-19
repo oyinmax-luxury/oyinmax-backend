@@ -20,11 +20,25 @@ const app = express();
 //middleware
 app.use(express.json());
 
+// // Configure CORS
+// app.use(cors({
+//   origin: ['http://localhost:5173', 'https://oyinmax-frontend.vercel.app/', 'https://www.oyinmaxluxury.com/'],
+//   credentials: true,                
+// }));
+
 // Configure CORS
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://oyinmax-frontend.vercel.app/', 'https://www.oyinmaxluxury.com/'],
-  credentials: true,                
+  // Removed trailing slashes from the production URLs
+  origin: [
+    'http://localhost:5173', 
+    'https://oyinmax-frontend.vercel.app', 
+    'https://www.oyinmaxluxury.com'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Explicitly allow standard methods
+  allowedHeaders: ['Content-Type', 'Authorization'] // Ensure headers are allowed
 }));
+
 
 app.use(helmet());
 app.use(morgan('dev'));
